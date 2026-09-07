@@ -100,54 +100,30 @@ class HNSWIndex(BaseIndex):
         self, query: np.ndarray, entry: int, ef: int, layer: int
     ) -> list[tuple[float, int]]:
         """
-        Search a single layer starting from entry point.
+        Search a single layer starting from entry point using HNSW Algorithm 2.
 
         Uses two heaps:
-          - candidates: min-heap by DISTANCE (= max-heap by similarity via negation)
-            → pop gives the CLOSEST unvisited candidate to expand next
-          - results: max-heap by DISTANCE (= min-heap by similarity)
-            → pop gives the WORST (most distant) result to evict
+          - candidates_heap: min-heap of (-sim, idx) so heappop yields the
+            unvisited candidate with the highest similarity.
+          - results_heap: min-heap of (sim, idx) tracking the best ef results found,
+            where results_heap[0] is the worst (lowest similarity) result.
 
-        Returns a list of (similarity, node_idx) — the best ef candidates.
+        Returns a list of (similarity, node_idx) tuples for the top ef candidates.
         """
         visited = {entry}
         sim_entry = self._similarity_to_query(query, entry)
 
-        # candidates: stored as (-similarity, idx) so heappop gives highest similarity
-        candidates = [(-sim_entry, entry)]
-        # results: stored as (distance, idx) where distance = -similarity
-        #          so heappop gives the WORST result (lowest similarity / highest distance)
-        #          This is a max-heap on distance = min-heap on similarity
-        results = [(- sim_entry, entry)]  # actually we want worst on top
-        # Wait — let me think about this more carefully.
-        #
-        # We want:
-        #   candidates: expand the BEST (highest similarity) candidate first
-        #     → store as (-sim, idx), heappop gives most negative = highest sim
-        #   results: evict the WORST (lowest similarity) result
-        #     → store as (-sim, idx), but we want worst on top
-        #     → negate the negate? No. We need a max-heap on -sim = min-heap on sim
-        #     → store as (sim, idx) in a min-heap → heappop gives lowest sim = worst
-        #
-        # Let me redo this properly:
-
-        # candidates: min-heap on (-sim) → pop returns highest similarity first
-        candidates = [(-sim_entry, entry)]
-        # results: min-heap on (sim) → pop returns lowest similarity (worst result)
+        candidates_heap = [(-sim_entry, entry)]
         results_heap = [(sim_entry, entry)]
 
-        while candidates:
-            neg_sim_c, c_idx = heapq.heappop(candidates)
-            current_best_sim = -neg_sim_c  # similarity of best unvisited candidate
+        while candidates_heap:
+            neg_sim_c, c_idx = heapq.heappop(candidates_heap)
+            current_best_sim = -neg_sim_c
 
-            # Worst result similarity
             worst_result_sim = results_heap[0][0]
-
-            # If best candidate is worse than worst result, we can't improve
-            if current_best_sim < worst_result_sim and len(results_heap) >= ef:
+            if len(results_heap) >= ef and current_best_sim < worst_result_sim:
                 break
 
-            # Expand neighbors of this candidate
             node_neighbors = self.neighbors.get(c_idx, {}).get(layer, [])
             for n_idx in node_neighbors:
                 if n_idx in visited:
@@ -156,12 +132,14 @@ class HNSWIndex(BaseIndex):
 
                 n_sim = self._similarity_to_query(query, n_idx)
 
-                # Add to results if better than worst, or results not full
+                # Push neighbor to candidate heap
+                heapq.heappush(candidates_heap, (-n_sim, n_idx))
+
+                # Push to results heap if better than worst result or capacity not reached
                 if len(results_heap) < ef or n_sim > results_heap[0][0]:
-                    heapq.heappush(candidates, (-n_sim, n_idx))
                     heapq.heappush(results_heap, (n_sim, n_idx))
                     if len(results_heap) > ef:
-                        heapq.heappop(results_heap)  # evict worst
+                        heapq.heappop(results_heap)
 
         # Convert to (similarity, idx) list
         return [(sim, idx) for sim, idx in results_heap]

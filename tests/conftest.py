@@ -5,8 +5,11 @@ Reusable fixtures for unit, integration, and API tests.
 Uses small datasets (N=100, D=16) for fast execution.
 """
 
+import os
 import numpy as np
 import pytest
+
+os.environ["VECTORFORGE_SKIP_AUTOLOAD"] = "1"
 
 from app.core.vector_store import VectorStore
 from app.core.distance import normalize
