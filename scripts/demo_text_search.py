@@ -63,7 +63,9 @@ def text_to_vector(text: str, dim: int = 128) -> np.ndarray:
     Embed text into a deterministic normalized D-dimensional vector using feature hashing.
     Zero external dependencies — pure Python + NumPy!
     """
-    words = text.lower().replace(".", "").replace(",", "").split()
+    # Replace punctuation with space and normalize
+    clean_text = text.lower().replace(".", " ").replace(",", " ").replace("-", " ")
+    words = clean_text.split()
     vec = np.zeros(dim, dtype=np.float32)
 
     for word in words:
