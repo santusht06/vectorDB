@@ -54,6 +54,7 @@ def measure_latency(
         "avg_ms": float(np.mean(latencies)),
         "p50_ms": float(np.percentile(latencies, 50)),
         "p95_ms": float(np.percentile(latencies, 95)),
+        "p99_ms": float(np.percentile(latencies, 99)),
         "min_ms": float(np.min(latencies)),
         "max_ms": float(np.max(latencies)),
         "total_queries": len(queries),
@@ -66,10 +67,11 @@ def benchmark_index(
     ground_truth: dict[int, list[str]],
     k: int = 10,
     name: str = "",
+    memory_mb: float | None = None,
     **kwargs,
 ) -> dict[str, Any]:
     """
-    Benchmark an index on latency and recall@k.
+    Benchmark an index on latency, recall@k, and memory.
     """
     stats = measure_latency(index.search, queries, k=k, **kwargs)
 
@@ -93,7 +95,9 @@ def benchmark_index(
         "mean_ms": stats["avg_ms"],
         "p50_ms": stats["p50_ms"],
         "p95_ms": stats["p95_ms"],
+        "p99_ms": stats["p99_ms"],
         "recall": avg_recall,
+        "memory_mb": memory_mb,
     }
 
 
@@ -103,18 +107,35 @@ def format_benchmark_results(
 ) -> str:
     """Format benchmark results into a clean markdown / plain text table."""
     lines = []
-    lines.append("=" * 83)
-    lines.append(f"{'Index Name':<32} {'Recall@10':<10} {'Mean (ms)':<10} {'p50 (ms)':<10} {'p95 (ms)':<10} {'Speedup':<8}")
-    lines.append("-" * 83)
+    has_memory = any(r.get("memory_mb") is not None for r in results)
+
+    if has_memory:
+        header = f"{'Index Name':<30} {'Recall@10':<10} {'Mean (ms)':<10} {'p50 (ms)':<10} {'p95 (ms)':<10} {'p99 (ms)':<10} {'Speedup':<8} {'Memory':<10}"
+    else:
+        header = f"{'Index Name':<30} {'Recall@10':<10} {'Mean (ms)':<10} {'p50 (ms)':<10} {'p95 (ms)':<10} {'p99 (ms)':<10} {'Speedup':<8}"
+    line_len = len(header)
+
+    lines.append("=" * line_len)
+    lines.append(header)
+    lines.append("-" * line_len)
 
     base_lat = brute_latency_ms or (results[0]["mean_ms"] if results else 1.0)
 
     for r in results:
         speedup = base_lat / r["mean_ms"] if r["mean_ms"] > 0 else 0.0
-        lines.append(
-            f"{r['name']:<32} {r['recall']*100:>8.2f}%  {r['mean_ms']:>9.4f}  {r['p50_ms']:>9.4f}  {r['p95_ms']:>9.4f}  {speedup:>7.2f}x"
+        p99_str = f"{r.get('p99_ms', 0.0):>9.4f}"
+        base_str = (
+            f"{r['name']:<30} {r['recall']*100:>8.2f}%  {r['mean_ms']:>9.4f}  "
+            f"{r['p50_ms']:>9.4f}  {r['p95_ms']:>9.4f}  {p99_str}  {speedup:>7.2f}x"
         )
-    lines.append("=" * 83)
+        if has_memory:
+            mem_val = r.get("memory_mb")
+            mem_str = f"{mem_val:>8.2f}MB" if mem_val is not None else "       N/A"
+            lines.append(f"{base_str}  {mem_str}")
+        else:
+            lines.append(base_str)
+
+    lines.append("=" * line_len)
     return "\n".join(lines)
 
 

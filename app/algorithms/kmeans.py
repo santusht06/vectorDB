@@ -84,11 +84,12 @@ def kmeans(
 
         assignments = new_assignments
 
-        # Step 4: Recompute centroids
-        for j in range(k):
-            members = vectors[assignments == j]
-            if len(members) > 0:
-                centroids[j] = members.mean(axis=0)
+        # Step 4: Recompute centroids (vectorized scatter-add)
+        sum_vecs = np.zeros((k, d), dtype=np.float32)
+        counts = np.bincount(assignments, minlength=k)
+        np.add.at(sum_vecs, assignments, vectors)
+        mask = counts > 0
+        centroids[mask] = sum_vecs[mask] / counts[mask, np.newaxis]
 
         # Re-normalize centroids if using cosine distance
         if use_cosine:

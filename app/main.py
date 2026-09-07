@@ -17,7 +17,10 @@ from app.indexes.manager import IndexManager
 async def lifespan(app: FastAPI):
     """Initialize IndexManager on startup and auto-load dataset if available."""
     manager = IndexManager()
-    if os.path.exists(os.path.join(DATA_DIR, "vectors.npy")):
+    if (
+        os.path.exists(os.path.join(DATA_DIR, "vectors.npy"))
+        and not os.environ.get("VECTORFORGE_SKIP_AUTOLOAD")
+    ):
         manager.load_data(DATA_DIR)
     else:
         manager.build_index("brute")
