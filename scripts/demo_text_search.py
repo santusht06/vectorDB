@@ -5,7 +5,7 @@ Embeds a sample text corpus into 128-dimensional vectors using pure Python/NumPy
 indexes them in VectorForge, and allows querying text statements to find the top matching pairs.
 
 Usage:
-    python scripts/demo_text_search.py "machine learning and artificial intelligence"
+    python scripts/demo_text_search.py "express js and node web backend framework"
 """
 
 import sys
@@ -20,33 +20,41 @@ from app.core.distance import normalize
 from app.indexes.manager import IndexManager
 
 
-# Sample corpus of short texts across various topics
+# Expanded sample corpus of short texts across Web Dev, AI, Emotions, and Databases
 SAMPLE_TEXTS = [
-    "Artificial intelligence and deep neural networks are transforming technology.",
-    "Machine learning algorithms optimize models using gradient descent optimization.",
+    # Web Development & Frameworks
+    "Express.js is a minimalist web framework for Node.js used to build backend APIs.",
+    "Node.js enables asynchronous JavaScript execution on the server side.",
+    "React.js is a front-end library for building interactive user interfaces with components.",
+    "JavaScript and TypeScript power modern full-stack web application development.",
+    "FastAPI is a modern high-performance web framework for building RESTful APIs in Python.",
+    "REST APIs allow clients to exchange JSON data over HTTP requests.",
+
+    # Emotions & Psychology
+    "Human emotions like empathy, joy, and sadness shape interpersonal communication.",
+    "Emotional intelligence helps individuals manage stress and understand human feelings.",
+    "Psychology studies human cognition, behavioral responses, and emotional well-being.",
+
+    # AI & Machine Learning
+    "Artificial intelligence and deep neural networks are transforming modern technology.",
+    "Machine learning algorithms optimize predictive models using gradient descent.",
     "Natural language processing allows computers to analyze human text and speech.",
     "Computer vision models detect objects and recognize faces in digital images.",
     "Reinforcement learning agents learn optimal policies through environment interaction.",
+    "PyTorch and TensorFlow are popular open-source frameworks for deep learning research.",
+
+    # Vector DB & Search
     "Vector databases enable fast similarity search across high-dimensional embeddings.",
     "Hierarchical Navigable Small World graphs provide efficient graph-based nearest neighbor search.",
     "Inverted File indexes use K-Means clustering to partition vector spaces into Voronoi cells.",
     "Cosine similarity measures the angle between normalized vectors in multi-dimensional space.",
-    "Relational databases use SQL queries and B-tree indexes for structured transactional data.",
+
+    # Databases & Systems
+    "Relational databases use SQL queries and B-tree indexes for structured data.",
     "NoSQL document databases store unstructured data as JSON documents with horizontal scaling.",
-    "Cloud computing platforms offer scalable virtual machines, storage, and serverless functions.",
-    "Distributed computing systems handle large-scale data processing across multi-node clusters.",
-    "Microservice architecture decouples monolithic applications into independently deployable services.",
     "Docker containers package applications with runtime dependencies for consistent deployment.",
     "Kubernetes manages container orchestration, automated scaling, and cluster health monitoring.",
-    "Python is a popular programming language widely used in data science and AI development.",
-    "FastAPI is a modern high-performance web framework for building RESTful APIs in Python.",
-    "NumPy provides high-performance N-dimensional array objects and mathematical operations.",
-    "PyTorch and TensorFlow are popular open-source frameworks for deep learning research.",
-    "Software engineering principles emphasize clean code, modular design, and comprehensive testing.",
-    "Continuous integration and continuous deployment pipelines automate software testing and release.",
     "Git version control tracks source code history and facilitates collaborative team workflows.",
-    "Cybersecurity protocols protect sensitive data against unauthorized network intrusion and malware.",
-    "Data structure efficiency determines algorithm runtime complexity and memory footprint.",
 ]
 
 
@@ -55,7 +63,7 @@ def text_to_vector(text: str, dim: int = 128) -> np.ndarray:
     Embed text into a deterministic normalized D-dimensional vector using feature hashing.
     Zero external dependencies — pure Python + NumPy!
     """
-    words = text.lower().split()
+    words = text.lower().replace(".", "").replace(",", "").split()
     vec = np.zeros(dim, dtype=np.float32)
 
     for word in words:
@@ -77,14 +85,14 @@ def text_to_vector(text: str, dim: int = 128) -> np.ndarray:
 
 
 def main():
-    print("=" * 70)
+    print("=" * 75)
     print("        VectorForge — Interactive Text Similarity Search Demo")
-    print("=" * 70)
+    print("=" * 75)
 
     # Initialize IndexManager
     manager = IndexManager(dimension=128)
 
-    print(f"\nEmbedding and indexing {len(SAMPLE_TEXTS)} sample texts...")
+    print(f"\nIndexing {len(SAMPLE_TEXTS)} sample texts into VectorStore...")
     for idx, text in enumerate(SAMPLE_TEXTS):
         vec = text_to_vector(text, dim=128)
         manager.insert(
@@ -102,10 +110,10 @@ def main():
     if len(sys.argv) > 1:
         query_text = " ".join(sys.argv[1:])
     else:
-        query_text = "neural networks and machine learning models"
+        query_text = "express js node framework"
 
     print(f"Query Statement: \"{query_text}\"")
-    print("-" * 70)
+    print("-" * 75)
 
     # Embed query statement
     query_vec = text_to_vector(query_text, dim=128)
@@ -117,9 +125,11 @@ def main():
         for rank, res in enumerate(results, 1):
             doc = manager.store.get(res.id)
             text_str = doc["metadata"]["text"]
-            print(f"  {rank}. [Score: {res.score:.4f}] {text_str}")
+            match_status = "Exact / High Match" if res.score >= 0.45 else "Closest Relative Match"
+            print(f"  {rank}. [{res.score:.4f}] ({match_status})")
+            print(f"     \"{text_str}\"")
 
-    print("\n" + "=" * 70)
+    print("\n" + "=" * 75)
 
 
 if __name__ == "__main__":
