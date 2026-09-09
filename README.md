@@ -1,28 +1,28 @@
 # VectorForge — Custom Vector Database from Scratch
 
-VectorForge is a production-grade, zero-dependency vector database engine built entirely from scratch in Python and NumPy. It implements exact nearest-neighbor search alongside two fundamental approximate nearest-neighbor (ANN) index architectures: **IVF-Flat** (Inverted File Index with K-Means clustering) and **HNSW** (Hierarchical Navigable Small World graphs).
+VectorForge is a production‑grade, zero‑dependency vector database engine built entirely from scratch in Python and NumPy. It implements exact nearest‑neighbor search alongside two fundamental approximate nearest‑neighbor (ANN) index architectures: **IVF‑Flat** (Inverted File Index with K‑Means clustering) and **HNSW** (Hierarchical Navigable Small World graphs).
 
 ---
 
 ## Key Features
 
-- **Exact & Approximate Nearest Neighbor Search**:
-  - **Brute Force**: Exhaustive $O(N \times D)$ cosine similarity scan — ground truth reference.
-  - **IVF-Flat**: Inverted File Index with custom $K$-Means clustering and centroid-based candidate pruning.
-  - **HNSW**: Multi-layer skip-graph ANN index with greedy top-layer navigation and $ef$-bounded candidate search.
-- **In-Memory Vector Store**:
-  - Direct NumPy array storage ($N \times D$ float32) with automatic vector normalization on ingestion.
-  - Logical soft-deletion support (`active_mask` filtering).
-  - Fast lookup map ($O(1)$ ID to row index) and metadata handling.
+- **Exact & Approximate Nearest Neighbor Search**
+  - **Brute Force** – Exhaustive $O(N \times D)$ cosine‑similarity scan; serves as the ground‑truth reference.
+  - **IVF‑Flat** – Inverted File Index with custom $K$‑Means clustering and centroid‑based candidate pruning.
+  - **HNSW** – Multi‑layer skip‑graph ANN index with greedy top‑layer navigation and $ef$‑bounded candidate search.
+- **In‑Memory Vector Store**
+  - Direct NumPy array storage ($N \times D$ float32) with automatic vector normalization on ingestion.
+  - Logical soft‑deletion support (`active_mask` filtering).
+  - Fast lookup map ($O(1)$ ID → row index) and metadata handling.
   - Native binary persistence (`.npy` array serialization and JSON metadata).
-- **FastAPI REST Service**:
+- **FastAPI REST Service**
   - Vector CRUD operations (`POST /vectors`, `POST /vectors/bulk`, `GET /vectors/{id}`, `DELETE /vectors/{id}`).
-  - Parameterized multi-index search endpoint (`POST /search`).
-  - System health check, index stats, and dynamically requested index rebuilding (`POST /rebuild/{index}`).
-- **Evaluation & Benchmarking Suite**:
+  - Parameterized multi‑index search endpoint (`POST /search`).
+  - System health check, index stats, and dynamic index rebuilding (`POST /rebuild/{index}`).
+- **Evaluation & Benchmarking Suite**
   - Automated synthetic clustered dataset generator.
-  - Ground truth calculation for recall computation (`Recall@K`).
-  - Detailed latency statistics ($p50$, $p95$, $p99$), build times, and relative speedup reporting.
+  - Ground‑truth calculation for recall computation (`Recall@K`).
+  - Detailed latency statistics ($p_{50}$, $p_{95}$, $p_{99}$), build times, and relative speed‑up reporting.
 
 ---
 
@@ -41,8 +41,8 @@ VectorForge is a production-grade, zero-dependency vector database engine built 
        ┌──────────────────────┘      │      └──────────────────────┐
        │                             │                             │
 ┌──────▼─────────┐          ┌────────▼────────┐           ┌────────▼────────┐
-│  Brute Force   │          │    IVF-Flat     │           │      HNSW       │
-│  (Exact Baseline)         │ (K-Means/Lists) │           │  (Multi-Layer)  │
+│  Brute Force   │          │    IVF‑Flat     │           │      HNSW       │
+│  (Exact Baseline)         │ (K‑Means/Lists) │           │  (Multi‑Layer)  │
 └──────┬─────────┘          └────────┬────────┘           └────────┬────────┘
        │                             │                             │
        └─────────────────────────────┼─────────────────────────────┘
@@ -62,7 +62,7 @@ vectordb/
 ├── app/
 │   ├── algorithms/
 │   │   ├── heap.py          # Min/Max heap wrappers for candidate tracking
-│   │   └── kmeans.py        # Manual K-Means clustering algorithm
+│   │   └── kmeans.py        # Manual K‑Means clustering algorithm
 │   ├── api/
 │   │   ├── routes_search.py # POST /search endpoint
 │   │   ├── routes_system.py # GET /health, GET /stats, POST /rebuild
@@ -70,18 +70,18 @@ vectordb/
 │   ├── core/
 │   │   ├── distance.py      # L2 normalization & Cosine similarity
 │   │   ├── exceptions.py    # Custom domain exceptions
-│   │   ├── topk.py          # Partial sort Top-K selector via argpartition
+│   │   ├── topk.py          # Partial‑sort Top‑K selector via argpartition
 │   │   ├── types.py         # SearchResult & IndexState dataclasses
-│   │   └── vector_store.py  # In-memory NumPy vector storage
+│   │   └── vector_store.py  # In‑memory NumPy vector storage
 │   ├── evaluation/
 │   │   ├── benchmark.py     # Latency & performance benchmark runner
-│   │   ├── ground_truth.py  # Exact nearest neighbor ground truth generator
+│   │   ├── ground_truth.py  # Exact nearest‑neighbor ground‑truth generator
 │   │   └── recall.py        # Recall@K calculation
 │   ├── indexes/
 │   │   ├── base.py          # Base index interface
-│   │   ├── brute_force.py   # Brute force search index
+│   │   ├── brute_force.py   # Brute‑force search index
 │   │   ├── hnsw.py          # Hierarchical Navigable Small World index
-│   │   ├── ivf.py           # IVF-Flat index
+│   │   ├── ivf.py           # IVF‑Flat index
 │   │   └── manager.py       # Index coordinator
 │   ├── schemas/             # Pydantic request/response models
 │   ├── config.py            # Global default configurations
@@ -94,7 +94,7 @@ vectordb/
 │   └── test_suite.py        # Master test runner & verification
 ├── tests/
 │   ├── api/                 # FastAPI integration tests
-│   ├── integration/         # Cross-index correctness tests
+│   ├── integration/         # Cross‑index correctness tests
 │   └── unit/                # Core module unit tests
 ├── requirements.txt
 └── README.md
