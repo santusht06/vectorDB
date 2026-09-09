@@ -102,27 +102,28 @@ vectordb/
 
 ---
 
-## Quick Start
-
-### 1. Requirements & Setup
-
-Ensure Python 3.10+ is installed:
+## Installation
 
 ```bash
-pip install -r requirements.txt
+# Ensure Python 3.10+ is available
+python -m pip install -r requirements.txt
 ```
 
-### 2. Run the Full Test & Verification Suite
+The project has **zero external dependencies** beyond the packages listed in `requirements.txt` (NumPy, FastAPI, Uvicorn, Pydantic, pytest, httpx).
 
-Execute the master verification runner:
+---
+
+## Quick Start
+
+### 1. Run the Full Test & Verification Suite
 
 ```bash
 python scripts/test_suite.py
 ```
 
-This automatically runs all unit tests, integration tests, API tests, dataset generation, index building, and benchmarks.
+This command runs all unit tests, integration tests, API tests, dataset generation, index building, and benchmarks.
 
-### 3. Run Pytest Directly
+### 2. Run Pytest Directly
 
 ```bash
 python -m pytest tests/ -v
@@ -132,7 +133,7 @@ python -m pytest tests/ -v
 
 ## Benchmark & Performance Evaluation
 
-Run performance benchmarks against a synthetic clustered dataset ($N=1000, D=128$):
+Generate a synthetic clustered dataset and run benchmarks:
 
 ```bash
 python scripts/generate_dataset.py -n 1000 -d 128
@@ -144,8 +145,8 @@ python scripts/benchmark.py
 | Index Name | Parameters | Recall@10 | Mean Latency (ms) | Speedup vs Brute |
 |---|---|---|---|---|
 | Brute Force | Exact | 100.0% | 0.42 ms | 1.00x |
-| IVF-Flat | nprobe=1 | 78.4% | 0.08 ms | 5.25x |
-| IVF-Flat | nprobe=5 | 96.2% | 0.19 ms | 2.21x |
+| IVF‑Flat | nprobe=1 | 78.4% | 0.08 ms | 5.25x |
+| IVF‑Flat | nprobe=5 | 96.2% | 0.19 ms | 2.21x |
 | HNSW | ef=10 | 85.1% | 0.06 ms | 7.00x |
 | HNSW | ef=50 | 98.6% | 0.14 ms | 3.00x |
 
@@ -153,34 +154,33 @@ python scripts/benchmark.py
 
 ## Running the API Server
 
-Start the FastAPI application with Uvicorn:
-
 ```bash
 uvicorn app.main:app --reload --port 8000
 ```
 
-Access Swagger UI interactive documentation at:
-`http://localhost:8000/docs`
+Open the interactive Swagger UI at `http://localhost:8000/docs`.
 
 ### Core API Examples
 
-#### Insert Single Vector
+#### Insert a Single Vector
+
 ```bash
 curl -X POST "http://localhost:8000/vectors" \
   -H "Content-Type: application/json" \
   -d '{
     "id": "v1",
-    "vector": [0.1, 0.2, ..., 0.5],
+    "vector": [0.1, 0.2, 0.3, 0.4, 0.5],
     "metadata": {"category": "tech"}
   }'
 ```
 
-#### Perform Search
+#### Perform a Search
+
 ```bash
 curl -X POST "http://localhost:8000/search" \
   -H "Content-Type: application/json" \
   -d '{
-    "query": [0.1, 0.2, ..., 0.5],
+    "query": [0.1, 0.2, 0.3, 0.4, 0.5],
     "k": 5,
     "index": "hnsw",
     "ef_search": 50
@@ -191,4 +191,4 @@ curl -X POST "http://localhost:8000/search" \
 
 ## License
 
-MIT License. Designed and engineered for production-grade educational & benchmark use.
+MIT License. Designed and engineered for production‑grade educational & benchmark use.
