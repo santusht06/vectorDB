@@ -1,5 +1,7 @@
 # VectorForge — Custom Vector Database from Scratch
 
+![AI Maintained](https://img.shields.io/badge/readme-AI%20maintained-blue)
+
 VectorForge is a production‑grade, zero‑dependency vector database engine built entirely from scratch in Python and NumPy. It implements exact nearest‑neighbor search alongside two fundamental approximate nearest‑neighbor (ANN) index architectures: **IVF‑Flat** (Inverted File Index with K‑Means clustering) and **HNSW** (Hierarchical Navigable Small World graphs).
 
 ---
@@ -61,8 +63,6 @@ VectorForge is a production‑grade, zero‑dependency vector database engine bu
 vectordb/
 ├── app/
 │   ├── algorithms/
-│   │   ├── heap.py          # Min/Max heap wrappers for candidate tracking
-│   │   └── kmeans.py        # Manual K‑Means clustering algorithm
 │   ├── api/
 │   │   ├── routes_search.py # POST /search endpoint
 │   │   ├── routes_system.py # GET /health, GET /stats, POST /rebuild
