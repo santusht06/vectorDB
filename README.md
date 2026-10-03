@@ -63,6 +63,8 @@ VectorForge is a production‑grade, zero‑dependency vector database engine bu
 vectordb/
 ├── app/
 │   ├── algorithms/
+│   │   ├── heap.py          # Min/Max heap wrappers for candidate tracking
+│   │   └── kmeans.py        # Manual K‑Means clustering algorithm
 │   ├── api/
 │   │   ├── routes_search.py # POST /search endpoint
 │   │   ├── routes_system.py # GET /health, GET /stats, POST /rebuild
@@ -126,8 +128,6 @@ This command runs all unit tests, integration tests, API tests, dataset generati
 ### 2. Run Pytest Directly
 
 ```bash
-python -m pytest tests/ -v
-```
 
 ---
 
