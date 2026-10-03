@@ -128,6 +128,8 @@ This command runs all unit tests, integration tests, API tests, dataset generati
 ### 2. Run Pytest Directly
 
 ```bash
+python -m pytest tests/ -v
+```
 
 ---
 
@@ -158,14 +160,14 @@ python scripts/benchmark.py
 uvicorn app.main:app --reload --port 8000
 ```
 
-Open the interactive Swagger UI at `http://localhost:8000/docs`.
+Open the interactive Swagger UI at `[http://localhost:8000/docs`.](http://localhost:8000/docs`.)
 
 ### Core API Examples
 
 #### Insert a Single Vector
 
 ```bash
-curl -X POST "http://localhost:8000/vectors" \
+curl -X POST "[http://localhost:8000/vectors"](http://localhost:8000/vectors") \
   -H "Content-Type: application/json" \
   -d '{
     "id": "v1",
@@ -177,7 +179,7 @@ curl -X POST "http://localhost:8000/vectors" \
 #### Perform a Search
 
 ```bash
-curl -X POST "http://localhost:8000/search" \
+curl -X POST "[http://localhost:8000/search"](http://localhost:8000/search") \
   -H "Content-Type: application/json" \
   -d '{
     "query": [0.1, 0.2, 0.3, 0.4, 0.5],
